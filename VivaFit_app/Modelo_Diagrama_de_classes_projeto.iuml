@@ -1,0 +1,224 @@
+@startuml
+skinparam classAttributeIconSize 0
+
+' Posicionamento dos enums no topo
+enum TipoRefeicao {
+  CAFE_MANHA
+  LANCHE_MANHA
+  ALMOCO
+  LANCHE_TARDE
+  JANTAR
+  CEIA
+}
+
+enum DiaSemana {
+  SEGUNDA
+  TERCA
+  QUARTA
+  QUINTA
+  SEXTA
+  SABADO
+  DOMINGO
+}
+
+' Classe base Usuario
+abstract class Usuario {
+  -id: Integer
+  -nome: String
+  -email: String
+  -senha: String
+  -dataNascimento: Date
+  -telefone: String
+  +getId(): Integer
+  +getNome(): String
+  +getEmail(): String
+  +setEmail(email: String): void
+  +setSenha(senha: String): void
+  +autenticar(email: String, senha: String): boolean
+}
+
+' Classes que herdam de Usuario
+class Nutricionista {
+  -crn: String
+  -especialidade: String
+  +getCrn(): String
+  +getEspecialidade(): String
+  +gerenciarDieta(cliente: Cliente): boolean
+  +visualizarClientes(): List<Cliente>
+  +acompanharConsumoDiario(cliente: Cliente): RelatorioConsumo
+}
+
+class Cliente {
+  -peso: Double
+  -altura: Double
+  -objetivoPrincipal: String
+  -nivelAtividadeFisica: String
+  -restricoesAlimentares: List<String>
+  -metaPeso: Double
+  -metaCalorias: Integer
+  +getPeso(): Double
+  +setPeso(peso: Double): void
+  +getAltura(): Double
+  +calcularIMC(): Double
+  +getObjetivoPrincipal(): String
+  +getMetaPeso(): Double
+  +getMetaCalorias(): Integer
+  +registrarRefeicaoConsumida(refeicao: Refeicao): void
+  +registrarTreinoRealizado(treino: Treino): void
+  +atualizarProgresso(dados: RegistroProgresso): void
+}
+
+
+class Personal {
+  -cref: String
+  -especialidade: String
+  +getCref(): String
+  +getEspecialidade(): String
+  +gerenciarRotina(cliente: Cliente): boolean
+  +visualizarClientes(): List<Cliente>
+  +acompanharTreinos(cliente: Cliente): RelatorioTreinos
+}
+
+' Classes do lado esquerdo (Dieta)
+class Dieta {
+  -id: Integer
+  -dataInicio: Date
+  -dataFim: Date
+  -metaCaloricaDiaria: Integer
+  -refeicoes: List<Refeicao>
+  +getId(): Integer
+  +getMetaCaloricaDiaria(): Integer
+  +adicionarRefeicao(refeicao: Refeicao): void
+  +removerRefeicao(refeicao: Refeicao): void
+  +calcularCaloriasTotais(): Integer
+}
+
+class Refeicao {
+  -id: Integer
+  -tipo: TipoRefeicao
+  -horario: Time
+  -alimentos: List<Alimento>
+  -calorias: Integer
+  +getId(): Integer
+  +getTipo(): TipoRefeicao
+  +getHorario(): Time
+  +calcularCalorias(): Integer
+  +adicionarAlimento(alimento: Alimento): void
+}
+
+class Alimento {
+  -id: Integer
+  -nome: String
+  -caloriaPorGrama: Double
+  -porcao: Double
+  -proteinas: Double
+  -carboidratos: Double
+  -gorduras: Double
+  +getId(): Integer
+  +getNome(): String
+  +calcularCaloriaTotal(): Double
+  +getNutrientes(): Map<String, Double>
+}
+
+' Classes do lado direito (Treino)
+class RotinaTreino {
+  -id: Integer
+  -dataInicio: Date
+  -dataFim: Date
+  -objetivo: String
+  -treinos: List<Treino>
+  +getId(): Integer
+  +getObjetivo(): String
+  +adicionarTreino(treino: Treino): void
+  +removerTreino(treino: Treino): void
+  +getTreinos(): List<Treino>
+}
+
+class Treino {
+  -id: Integer
+  -diaSemana: DiaSemana
+  -tipoTreino: String
+  -exercicios: List<Exercicio>
+  -duracao: Integer
+  -caloriasEstimadas: Integer
+  +getId(): Integer
+  +getDiaSemana(): DiaSemana
+  +adicionarExercicio(exercicio: Exercicio): void
+  +calcularCaloriasEstimadas(): Integer
+}
+
+class Exercicio {
+  -id: Integer
+  -nome: String
+  -series: Integer
+  -repeticoes: Integer
+  -carga: Double
+  -observacoes: String
+  +getId(): Integer
+  +getNome(): String
+  +getSeries(): Integer
+  +getRepeticoes(): Integer
+  +getCarga(): Double
+}
+
+' Classes de Relatório
+class RelatorioConsumo {
+  -id: Integer
+  -data: Date
+  -cliente: Cliente
+  -refeicoesDiarias: List<Refeicao>
+  -caloriasTotais: Integer
+  -metaCalorica: Integer
+  +calcularProgresso(): Double
+  +adicionarRefeicao(refeicao: Refeicao): void
+  +gerarResumo(): String
+}
+
+class RelatorioTreinos {
+  -id: Integer
+  -data: Date
+  -cliente: Cliente
+  -treinosRealizados: List<Treino>
+  -observacoes: String
+  +registrarTreino(treino: Treino): void
+  +calcularFrequencia(): Double
+  +gerarResumo(): String
+}
+
+class RegistroProgresso {
+  -id: Integer
+  -data: Date
+  -peso: Double
+  -imc: Double
+  -observacoes: String
+  +calcularVariacaoPeso(): Double
+  +calcularVariacaoIMC(): Double
+}
+
+' Relações de herança
+Usuario <|-- Cliente
+Usuario <|-- Nutricionista
+Usuario <|-- Personal
+
+' Relações de agregação
+Nutricionista "1" o-- "*" Cliente : atende >
+Personal "1" o-- "*" Cliente : treina >
+
+' Relações de composição lado esquerdo
+Cliente "1" *-- "*" Dieta : possui >
+Dieta "1" *-- "*" Refeicao : composta >
+Refeicao "1" *-- "*" Alimento : contém >
+
+' Relações de composição lado direito
+Cliente "1" *-- "*" RotinaTreino : possui >
+RotinaTreino "1" *-- "*" Treino : composta >
+Treino "1" *-- "*" Exercicio : contém >
+
+' Novas relações com cardinalidades corretas
+Cliente "1" *-- "*" RegistroProgresso : possui >
+Cliente "1" *-- "*" RelatorioConsumo : possui >
+Cliente "1" *-- "*" RelatorioTreinos : possui >
+Nutricionista "1" *-- "*" RelatorioConsumo : gera >
+Personal "1" *-- "*" RelatorioTreinos : gera >
+
+@enduml
