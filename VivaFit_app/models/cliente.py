@@ -8,7 +8,7 @@ class Cliente(Usuario):
     altura = models.DecimalField(max_digits=3, decimal_places=2)
     objetivo_principal = models.CharField(max_length=255)
     nivel_atividade_fisica = models.CharField(max_length=50)
-    restricoes_alimentares = models.JSONField(default=list)
+    restricoes_alimentares = models.TextField(null=True, blank=True, default="Nenhuma")
     meta_peso = models.DecimalField(max_digits=5, decimal_places=2)
     meta_calorias = models.IntegerField()
 

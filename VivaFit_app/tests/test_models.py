@@ -18,6 +18,7 @@ class UsuarioTestCase(TestCase):
             altura=1.75,
             objetivo_principal='Emagrecer',
             nivel_atividade_fisica='Moderado',
+            restricoes_alimentares='Nenhuma',
             meta_peso=65.0,
             meta_calorias=2000
         )
@@ -35,6 +36,7 @@ class UsuarioTestCase(TestCase):
     def test_cliente_creation(self):
         self.assertEqual(self.cliente.nome, 'Cliente Teste')
         self.assertEqual(self.cliente.meta_calorias, 2000)
+        self.assertEqual(self.cliente.restricoes_alimentares, 'Nenhuma')
 
     def test_nutricionista_creation(self):
         self.assertEqual(self.nutricionista.crn, '12345')
@@ -52,6 +54,23 @@ class UsuarioTestCase(TestCase):
         )
         self.assertEqual(personal.cref, '54321')
         self.assertEqual(personal.especialidade, 'Musculação')
+
+    def test_cliente_restricoes_alimentares(self):
+        cliente = Cliente.objects.create(
+            username='cliente2',
+            email='cliente2@test.com',
+            nome='Cliente Teste 2',
+            data_nascimento=date(1990, 1, 1),
+            telefone='123456789',
+            peso=80.0,
+            altura=1.80,
+            objetivo_principal='Ganho de massa',
+            nivel_atividade_fisica='Intenso',
+            restricoes_alimentares='Lactose, Glúten',
+            meta_peso=85.0,
+            meta_calorias=3000
+        )
+        self.assertEqual(cliente.restricoes_alimentares, 'Lactose, Glúten')
 
 class DietaTestCase(TestCase):
     def setUp(self):
